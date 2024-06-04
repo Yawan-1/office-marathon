@@ -1,18 +1,18 @@
-import * as TaskManager from 'expo-task-manager';
-import * as Location from 'expo-location';
+const TaskManager = require("expo-task-manager");
+const Location = require("expo-location");
 
-import { addLocation } from './storage';
+const { addLocation } = require("./storage");
 
 /**
  * The unique name of the background location task.
  */
-export const locationTaskName = 'office-marathon';
+const locationTaskName = "office-marathon";
 
 /**
  * Check if the background location is started and running.
  * This is a wrapper around `Location.hasStartedLocationUpdatesAsync` with the task name prefilled.
  */
-export async function isTracking(): Promise<boolean> {
+export async function isNowTracking() {
   return await Location.hasStartedLocationUpdatesAsync(locationTaskName);
 }
 
@@ -22,28 +22,29 @@ export async function isTracking(): Promise<boolean> {
  */
 export async function startTracking() {
   await Location.startLocationUpdatesAsync(locationTaskName, {
-    accuracy: Location.Accuracy.BestForNavigation,
-    timeInterval: 15 * 1000,
-    // android behavior
-    foregroundService: {
-      notificationTitle: 'Office marathon is active',
-      notificationBody: 'Monitoring your location to measure total distance',
-      notificationColor: '#333333',
-    },
-    // ios behavior
-    activityType: Location.ActivityType.Fitness,
+    timeInterval: 1000,
+    accuracy: Location.Accuracy.Highest,
+    distanceInterval: 1,
+    deferredUpdatesInterval: 1000,
+    pausesUpdatesAutomatically: false,
     showsBackgroundLocationIndicator: true,
+    foregroundService: {
+      killServiceOnDestroy: false,
+      notificationTitle: "Using your location",
+      notificationBody:
+        "To turn off, go back to the app and switch something off.",
+    },
   });
-  console.log('[tracking]', 'started background location task');
+  console.log("[tracking]", "started background location task");
 }
 
 /**
  * Stop the background location monitoring.
  * This is a wrapper around `Location.stopLocationUpdatesAsync` with the task name prefilled.
  */
-export async function stopTracking() {
+async function stopTracking() {
   await Location.stopLocationUpdatesAsync(locationTaskName);
-  console.log('[tracking]', 'stopped background location task');
+  console.log("[tracking]", "stopped background location task");
 }
 
 /**
@@ -52,11 +53,15 @@ export async function stopTracking() {
  */
 TaskManager.defineTask(locationTaskName, async (event) => {
   if (event.error) {
-    return console.error('[tracking]', 'Something went wrong within the background location task...', event.error);
+    return console.error(
+      "[tracking]",
+      "Something went wrong within the background location task...",
+      event.error
+    );
   }
 
-  const locations = (event.data as any).locations as Location.LocationObject[];
-  console.log('[tracking]', 'Received new locations', locations);
+  const locations = event.data.locations;
+  console.log("[tracking]", "Received new locations", locations);
 
   try {
     // have to add it sequentially, parses/serializes existing JSON
@@ -64,6 +69,10 @@ TaskManager.defineTask(locationTaskName, async (event) => {
       await addLocation(location);
     }
   } catch (error) {
-    console.log('[tracking]', 'Something went wrong when saving a new location...', error);
+    console.log(
+      "[tracking]",
+      "Something went wrong when saving a new location...",
+      error
+    );
   }
 });

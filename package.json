@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@bycedric/office-marathon",
+  "name": "office-marathon",
   "version": "1.4.2",
   "main": "./src/index.ts",
   "scripts": {
