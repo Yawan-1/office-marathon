@@ -12,5 +12,3 @@ export function App() {
     </AssetProvider>
   );
 }
-
-// export default App;

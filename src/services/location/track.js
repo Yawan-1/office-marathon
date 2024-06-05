@@ -32,7 +32,7 @@ export async function startTracking() {
       killServiceOnDestroy: false,
       notificationTitle: "Using your location",
       notificationBody:
-        "To turn off, go back to the app and switch something off.",
+        "To turn off this, go back to the app and switch something off.",
     },
   });
   console.log("[tracking]", "started background location task");
@@ -42,7 +42,7 @@ export async function startTracking() {
  * Stop the background location monitoring.
  * This is a wrapper around `Location.stopLocationUpdatesAsync` with the task name prefilled.
  */
-async function stopTracking() {
+export async function stopTracking() {
   await Location.stopLocationUpdatesAsync(locationTaskName);
   console.log("[tracking]", "stopped background location task");
 }

@@ -33,7 +33,7 @@ export async function addLocation(location) {
   console.log(location);
   const existing = await getLocations();
   const locations = [...existing, location];
-  await setLocations(locations);
+  // await setLocations(locations);
   console.log(
     "[storage]",
     "added location -",
